@@ -1,0 +1,8 @@
+fastapi
+mangum
+uvicorn
+python-multipart
+python-jose[cryptography]
+httpx
+reportlab
+pandas
