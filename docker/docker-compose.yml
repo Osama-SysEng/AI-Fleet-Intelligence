@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fleet}
+      POSTGRES_USER: ${POSTGRES_USER:-fleet_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - fleet-postgres:/var/lib/postgresql/data
+      - ../backend/app/db/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [fleet-internal]
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      OPERATOR_TOKENS: ${OPERATOR_TOKENS:?OPERATOR_TOKENS is required}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fleet_app}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:-fleet}
+      TELEGRAM_SIMULATION_ONLY: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [fleet-internal]
+
+  dashboard:
+    image: nginx:1.27-alpine
+    volumes:
+      - ../dashboard:/usr/share/nginx/html:ro
+    ports:
+      - "${DASHBOARD_PORT:-8080}:80"
+    depends_on: [backend]
+    networks: [fleet-internal]
+
+volumes:
+  fleet-postgres:
+
+networks:
+  fleet-internal:
+    driver: bridge
+    internal: true
