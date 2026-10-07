@@ -3,9 +3,9 @@
 import os
 from fastapi import APIRouter, Depends, Header, HTTPException
 
-from backend.app.fleet.store import SimulationFleetStore
-from backend.app.models.vehicle import TelemetryIn
-from backend.app.services.violation_engine import evaluate_telemetry, explain
+from app.fleet.store import SimulationFleetStore
+from app.models.vehicle import TelemetryIn
+from app.services.violation_engine import evaluate_telemetry, explain
 
 router = APIRouter(prefix="/api/v1", tags=["fleet-simulation"])
 store = SimulationFleetStore()

@@ -1,5 +1,5 @@
 import unittest
-from backend.app.fleet.store import SimulationFleetStore
+from app.fleet.store import SimulationFleetStore
 
 def sample(sequence=1, speed=70, fuel=50, temp=80): return {"vehicle_id":"sim-fleet-01","sequence":sequence,"occurred_at":"2026-08-24T10:00:00Z","latitude":31.95,"longitude":35.91,"speed_kph":speed,"fuel_percent":fuel,"engine_temp_c":temp}
 class FleetCoreTests(unittest.TestCase):

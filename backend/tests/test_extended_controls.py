@@ -1,8 +1,8 @@
 import unittest
 
-from backend.app.models.vehicle import TelemetryIn, Vehicle
-from backend.app.services.telegram_alerts import TelegramAlertService
-from backend.app.services.violation_engine import evaluate_telemetry
+from app.models.vehicle import TelemetryIn, Vehicle
+from app.services.telegram_alerts import TelegramAlertService
+from app.services.violation_engine import evaluate_telemetry
 
 
 class ExtendedControlsTests(unittest.TestCase):

@@ -1,10 +1,10 @@
-from .contracts import TelemetryPoint, coarse_location
+from .contracts import TelemetryPoint, coarse_location, parse_telemetry
 from .risk import assess
 
 class SimulationFleetStore:
     def __init__(self): self._seen, self._events, self._audit = set(), [], []
     def ingest(self, raw: dict) -> dict:
-        point = __import__("backend.app.fleet.contracts", fromlist=["parse_telemetry"]).parse_telemetry(raw)
+        point = parse_telemetry(raw)
         key = f"{point.vehicle_id}:{point.sequence}"
         if key in self._seen: return {"accepted": True, "duplicate": True, "event": None}
         self._seen.add(key); recommendation = assess(point)
