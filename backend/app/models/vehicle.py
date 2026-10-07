@@ -39,3 +39,19 @@ class TelemetryIn(BaseModel):
     speed_kph: float = Field(ge=0, le=260)
     fuel_percent: float = Field(ge=0, le=100)
     engine_temp_c: float = Field(ge=-40, le=180)
+
+    @field_validator("vehicle_id")
+    @classmethod
+    def vehicle_id_sane(cls, value: str) -> str:
+        if any(ord(char) < 32 for char in value):
+            raise ValueError("control characters are not allowed")
+        if not value.strip():
+            raise ValueError("vehicle_id must not be blank")
+        return value
+
+    @field_validator("occurred_at")
+    @classmethod
+    def occurred_at_tz_aware(cls, value: datetime) -> datetime:
+        if value.tzinfo is None:
+            raise ValueError("occurred_at must include timezone")
+        return value

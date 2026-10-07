@@ -8,4 +8,6 @@ COPY backend /app/backend
 USER 10001
 EXPOSE 8000
 HEALTHCHECK --interval=30s CMD python -c "import urllib.request;urllib.request.urlopen('http://localhost:8000/health')"
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+# Single worker: the simulation store is in-memory, so idempotency
+# (vehicle_id:sequence dedup) only holds with --workers 1.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
