@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 from app.fleet.store import SimulationFleetStore
 from app.models.vehicle import TelemetryIn
 from app.services.violation_engine import evaluate_telemetry, explain
+from fastapi import Query
 
 router = APIRouter(prefix="/api/v1", tags=["fleet-simulation"])
 store = SimulationFleetStore()
@@ -37,13 +38,13 @@ def telemetry(payload: TelemetryIn):
 
 
 @router.get("/events", dependencies=[Depends(operator_guard)])
-def events():
-    return store.events()
+def events(limit: int = Query(50, ge=1, le=500)):
+    return store.events()[:limit]
 
 
 @router.get("/audit", dependencies=[Depends(operator_guard)])
-def audit():
-    return store.audit()
+def audit(limit: int = Query(50, ge=1, le=500)):
+    return store.audit()[:limit]
 
 
 @router.post("/commands")
