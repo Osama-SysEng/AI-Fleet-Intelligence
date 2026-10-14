@@ -9,6 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.router import router
+from app.core.logging_utils import get_logger, new_request_id, request_id_ctx
+
+access_logger = get_logger("http.access")
 
 
 def _cors_origins() -> list[str]:
@@ -35,6 +38,27 @@ app.add_middleware(
     allow_headers=["Content-Type", "X-Operator-Token"],
     max_age=600,
 )
+
+
+@app.middleware("http")
+async def request_id_middleware(request: Request, call_next):
+    request_id = request.headers.get("X-Request-ID") or new_request_id()
+    request_id_ctx.set(request_id)
+    start = time.monotonic()
+    response = await call_next(request)
+    duration_ms = round((time.monotonic() - start) * 1000, 2)
+    response.headers["X-Request-ID"] = request_id
+    access_logger.info(
+        f"access: {request.method} {request.url.path} -> {response.status_code}",
+        extra={"fields": {
+            "event": "http.access",
+            "method": request.method,
+            "route": request.url.path,
+            "status": response.status_code,
+            "duration_ms": duration_ms,
+        }},
+    )
+    return response
 
 
 @app.middleware("http")
