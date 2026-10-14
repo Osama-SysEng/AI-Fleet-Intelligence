@@ -42,3 +42,4 @@ python3 -m compileall -q backend
 - لا تتبع GPS حي ولا اتصال بالمركبات أو CRM أو السائقين — كل القراءات عينات يدوية.
 - الموقع في الشاشة تقريبي (تقريب منزلتين) وليس بدقة تشغيلية.
 - ملف `dashboard/src/Dashboard.js` إرث غير مستخدم (يشير لمكتبات socket.io/redux غير موجودة) — الواجهة الفعلية هي `dashboard/index.html` فقط.
+- Structured JSON logging + X-Request-ID tracing (see docs/LOGGING.md).
